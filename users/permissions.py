@@ -19,3 +19,13 @@ class IsProductorUser(permissions.BasePermission):
 class IsOperadorUser(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role == 'OPERADOR'
+    
+    # HU: Consulta de lotes por finca — accesible para productor, técnico y admin
+class IsProductorOrTecnicoOrAdmin(permissions.BasePermission):
+    ROLES_PERMITIDOS = {'PRODUCTOR', 'TECNICO', 'ADMIN'}
+
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and request.user.role in self.ROLES_PERMITIDOS
+        )
