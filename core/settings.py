@@ -35,10 +35,10 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -87,7 +87,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 AUTH_USER_MODEL = 'users.User'
 
 CORS_ALLOWED_ORIGINS = [
-    "https://frontend-sig-arroz-git-main-nicoleestefania21s-projects.vercel.app/",
+    "https://frontend-sig-arroz-git-main-nicoleestefania21s-projects.vercel.app",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
