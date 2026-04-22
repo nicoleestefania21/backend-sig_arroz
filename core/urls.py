@@ -10,5 +10,6 @@ router.register(r'lotes', LoteViewSet)
 urlpatterns = [
     path('users/', include('users.urls')),
     path('fincas/lotes/', LotesPorFincaView.as_view(), name='lotes-por-finca'),
+    path('', include('siembra.urls')),
     path('', include(router.urls)),
 ]

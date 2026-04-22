@@ -1,6 +1,36 @@
+# Entorno virtual
 venv/
 .env
+
+# Python
 __pycache__/
-db.sqlite3
 *.pyc
+*.pyo
+*.pyd
+.Python
+
+# Base de datos local
+db.sqlite3
+*.sqlite3
+
+# IDEs
 .vscode/
+.idea/
+*.iml
+
+# Django
+staticfiles/
+media/
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Migraciones compiladas (opcional, muchos equipos sí suben las migraciones)
+# *.pyc dentro de migrations ya queda cubierto arriba
+
+# Coverage / testing
+.coverage
+htmlcov/
+.pytest_cache/
