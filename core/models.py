@@ -45,3 +45,21 @@ class Lote(models.Model):
     @property
     def disponible(self):
         return self.estado == self.DISPONIBLE
+    
+class LaborTerreno(models.Model):
+    lote = models.ForeignKey(Lote, on_delete=models.CASCADE, related_name='labores')
+    tipo_labor = models.CharField(max_length=100)
+    fecha = models.DateField()
+
+    ph = models.FloatField(null=True, blank=True)
+    humedad = models.FloatField(null=True, blank=True)
+
+    nivelacion = models.BooleanField(default=False)
+    drenaje = models.BooleanField(default=False)
+    adecuacion = models.BooleanField(default=False)
+
+    estado_terreno = models.CharField(max_length=100)
+    observaciones = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.tipo_labor} - {self.lote.nombre}"
