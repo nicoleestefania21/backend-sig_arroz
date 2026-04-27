@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Finca, Lote
+from .models import Finca, Lote, LaborTerreno
 
 
 class FincaSerializer(serializers.ModelSerializer):
@@ -49,3 +49,8 @@ class LotesPorFincaSerializer(serializers.ModelSerializer):
             'disponible',
             'observaciones',
         ]
+
+class LaborTerrenoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LaborTerreno
+        fields = '__all__'
