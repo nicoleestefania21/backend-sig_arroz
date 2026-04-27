@@ -12,4 +12,5 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('fincas/lotes/', LotesPorFincaView.as_view(), name='lotes-por-finca'),
     path('', include(router.urls)),
+    path('', include('ciclos.urls')),
 ]

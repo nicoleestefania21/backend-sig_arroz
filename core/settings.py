@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'core',
+    'ciclos', 
     'corsheaders',
 ]
 
