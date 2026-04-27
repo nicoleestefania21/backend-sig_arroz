@@ -2,8 +2,8 @@ from rest_framework import viewsets, generics, filters
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Finca, Lote
-from .serializers import FincaSerializer, LoteSerializer, LotesPorFincaSerializer
+from .models import Finca, Lote, LaborTerreno
+from .serializers import FincaSerializer, LoteSerializer, LotesPorFincaSerializer, LaborTerrenoSerializer
 from users.permissions import IsProductorOrTecnicoOrAdmin
 
 
@@ -62,3 +62,13 @@ class LotesPorFincaView(generics.ListAPIView):
             qs = qs.filter(estado=estado)
 
         return qs
+
+class LaborTerrenoViewSet(viewsets.ModelViewSet):
+    queryset = LaborTerreno.objects.all()
+    serializer_class = LaborTerrenoSerializer
+
+    def get_queryset(self):
+        lote_id = self.request.query_params.get('lote')
+        if lote_id:
+            return LaborTerreno.objects.filter(lote_id=lote_id)
+        return LaborTerreno.objects.all()    
