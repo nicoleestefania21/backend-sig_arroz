@@ -36,9 +36,9 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -100,3 +100,29 @@ CSRF_TRUSTED_ORIGINS = [
     "https://frontend-sig-arroz.vercel.app",
 ]
 
+# Al final de core/settings.py
+
+from datetime import timedelta
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+]
+
+# Agrega corsheaders al inicio del MIDDLEWARE (después de SecurityMiddleware)
+# MIDDLEWARE = [
+#     'django.middleware.security.SecurityMiddleware',
+#     'corsheaders.middleware.CorsMiddleware',   ← segunda posición
+#     ...
+# ]
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'SIGARROZ <no-reply@sigarroz.com>'
+FRONTEND_URL = 'http://localhost:5173'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

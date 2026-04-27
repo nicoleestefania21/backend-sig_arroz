@@ -117,3 +117,46 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# -- Al final del archivo --
+
+# Usuario personalizado
+AUTH_USER_MODEL = 'users.User'
+
+# Apps que faltaban
+INSTALLED_APPS += [
+    'users',
+    'corsheaders',
+    'rest_framework_simplejwt',
+]
+
+# CORS — permite que React (puerto 5173/5174) hable con Django (8000)
+MIDDLEWARE.insert(1, 'corsheaders.middleware.CorsMiddleware')
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+]
+
+# DRF — usa JWT como autenticación por defecto
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
+
+# SimpleJWT — tiempos de expiración
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+}
+
+# Email — en desarrollo usa la consola (el "email" aparece en la terminal)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'SIGARROZ <no-reply@sigarroz.com>'
+FRONTEND_URL = 'http://localhost:5173'  # para los links del email
