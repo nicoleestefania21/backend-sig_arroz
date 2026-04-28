@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-myjivrlt^=j%crl5lwce5c^69_4ff-u8&-z6$c9+@@ug7z2c*_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost").split(",")
 
 
 # Application definition
@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
+    'users',
     'core',
 ]
 
@@ -136,6 +138,7 @@ MIDDLEWARE.insert(1, 'corsheaders.middleware.CorsMiddleware')
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
+    "https://frontend-sig-arroz.vercel.app",
 ]
 
 # DRF — usa JWT como autenticación por defecto
