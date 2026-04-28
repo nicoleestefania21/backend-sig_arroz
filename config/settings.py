@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'users',
     'core',
-    'ciclos',
+    # 'ciclos',
 ]
 
 # ── Middleware (CorsMiddleware DEBE ir primero) ──────────────
