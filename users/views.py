@@ -8,17 +8,18 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer, EmailOrUsernameTokenObtainPairSerializer
 from .permissions import IsAdminUser
 
 
+class EmailOrUsernameTokenObtainPairView(TokenObtainPairView):
+    serializer_class = EmailOrUsernameTokenObtainPairSerializer
+
+
 class RegisterUserView(generics.CreateAPIView):
-    """
-    Solo un usuario autenticado con rol ADMIN puede crear otros usuarios.
-    URL: POST /api/users/register/
-    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -36,8 +37,30 @@ class RegisterUserView(generics.CreateAPIView):
         )
 
 
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all().order_by("id")
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all().order_by("id")
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+
+        if user.id == request.user.id:
+            return Response(
+                {"detail": "No puedes eliminar tu propio usuario."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return super().destroy(request, *args, **kwargs)
+
+
 class PasswordResetRequestView(APIView):
-    """Solicitar recuperación de contraseña."""
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -70,7 +93,6 @@ class PasswordResetRequestView(APIView):
 
 
 class PasswordResetConfirmView(APIView):
-    """Confirmar nueva contraseña."""
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -108,18 +130,8 @@ class PasswordResetConfirmView(APIView):
 
 
 class MeView(APIView):
-    """Devuelve los datos del usuario autenticado."""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
-    
-class UserListView(generics.ListAPIView):
-    """
-    Lista de usuarios solo para ADMIN.
-    GET /api/users/list/
-    """
-    queryset = User.objects.all().order_by("id")
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
