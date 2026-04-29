@@ -12,7 +12,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clave-local-solo')
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "backend-sigarroz-production.up.railway.app",
+]
 
 # ── Aplicaciones ────────────────────────────────────────────
 INSTALLED_APPS = [
