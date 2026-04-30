@@ -1,10 +1,10 @@
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
     RegisterUserView,
     PasswordResetRequestView,
+    PasswordResetValidateView,
     PasswordResetConfirmView,
     MeView,
     UserListView,
@@ -21,7 +21,12 @@ urlpatterns = [
     path("me/", MeView.as_view(), name="me"),
     path("password-reset/", PasswordResetRequestView.as_view(), name="password_reset"),
     path(
-        "password-reset/confirm/",
+        "password-reset/validate/<uidb64>/<token>/",
+        PasswordResetValidateView.as_view(),
+        name="password_reset_validate",
+    ),
+    path(
+        "password-reset/confirm/<uidb64>/<token>/",
         PasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
