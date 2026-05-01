@@ -1,9 +1,18 @@
 from rest_framework import permissions
+from rest_framework.permissions import BasePermission
 
 # Regla: Solo el administrador tiene permiso total
 class IsAdminUser(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role == 'ADMIN'
+
+class IsAdminRole(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and getattr(request.user, "role", None) == "ADMIN"
+        )
 
 # Regla: Solo el técnico puede crear planes y monitoreos
 class IsTecnicoUser(permissions.BasePermission):
