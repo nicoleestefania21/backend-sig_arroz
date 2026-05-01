@@ -96,7 +96,7 @@ class PasswordResetRequestView(APIView):
 
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            reset_link = f"{settings.FRONTEND_URL}/restablecer-contrasena/{uid}/{token}"
+            reset_link = f"{settings.FRONTEND_URL.rstrip('/')}/restablecer-contrasena/{uid}/{token}"
 
             print("FRONTEND_URL:", settings.FRONTEND_URL)
             print("RESET LINK:", reset_link)
