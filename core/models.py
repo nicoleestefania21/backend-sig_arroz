@@ -63,3 +63,24 @@ class LaborTerreno(models.Model):
 
     def __str__(self):
         return f"{self.tipo_labor} - {self.lote.nombre}"
+    
+class Siembra(models.Model):
+    METODO_DIRECTA = "DIRECTA"
+    METODO_TRASPLANTE = "TRASPLANTE"
+    METODO_VOLEO = "VOLEO"
+
+    METODO_CHOICES = [
+        (METODO_DIRECTA, "Siembra directa"),
+        (METODO_TRASPLANTE, "Trasplante"),
+        (METODO_VOLEO, "Voleo"),
+    ]
+
+    lote = models.ForeignKey(Lote, on_delete=models.CASCADE, related_name="siembras")
+    fecha_siembra = models.DateField()
+    variedad = models.CharField(max_length=100)
+    densidad_siembra = models.FloatField(help_text="kg/ha o similar")
+    metodo_siembra = models.CharField(max_length=20, choices=METODO_CHOICES)
+    observaciones = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Siembra {self.variedad} - {self.lote.nombre} ({self.fecha_siembra})"

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Finca, Lote, LaborTerreno
+from .models import Finca, Lote, LaborTerreno, Siembra
 
 
 class FincaSerializer(serializers.ModelSerializer):
@@ -82,4 +82,29 @@ class LaborTerrenoSerializer(serializers.ModelSerializer):
     def validate_humedad(self, value):
         if value is not None and (value < 0 or value > 100):
             raise serializers.ValidationError("La humedad debe estar entre 0 y 100.")
+        return value
+    
+class SiembraSerializer(serializers.ModelSerializer):
+    lote_nombre = serializers.CharField(source="lote.nombre", read_only=True)
+    finca_id = serializers.IntegerField(source="lote.finca.id", read_only=True)
+    finca_nombre = serializers.CharField(source="lote.finca.nombre", read_only=True)
+
+    class Meta:
+        model = Siembra
+        fields = [
+            "id",
+            "lote",
+            "lote_nombre",
+            "finca_id",
+            "finca_nombre",
+            "fecha_siembra",
+            "variedad",
+            "densidad_siembra",
+            "metodo_siembra",
+            "observaciones",
+        ]
+
+    def validate_densidad_siembra(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("La densidad de siembra debe ser mayor a cero.")
         return value

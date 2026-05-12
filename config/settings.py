@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "anymail",
     "users",
     "core",
+    "ciclos",
 ]
 
 MIDDLEWARE = [
