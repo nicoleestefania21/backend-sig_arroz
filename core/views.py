@@ -2,12 +2,13 @@ from rest_framework import viewsets, generics, filters
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Finca, Lote, LaborTerreno
+from .models import Finca, Lote, LaborTerreno, Siembra
 from .serializers import (
     FincaSerializer,
     LoteSerializer,
     LotesPorFincaSerializer,
     LaborTerrenoSerializer,
+    SiembraSerializer,
 )
 from users.permissions import IsProductorOrTecnicoOrAdmin
 
@@ -80,5 +81,29 @@ class LaborTerrenoViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(tipo_labor__icontains=tipo_labor)
         if fecha:
             queryset = queryset.filter(fecha=fecha)
+
+        return queryset
+    
+class SiembraViewSet(viewsets.ModelViewSet):
+    serializer_class = SiembraSerializer
+    permission_classes = [IsAuthenticated, IsProductorOrTecnicoOrAdmin]
+    queryset = Siembra.objects.all().select_related("lote", "lote__finca").order_by("-fecha_siembra", "-id")
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        lote_id = self.request.query_params.get("lote")
+        finca_id = self.request.query_params.get("finca")
+        metodo = self.request.query_params.get("metodo")
+        fecha = self.request.query_params.get("fecha_siembra")
+
+        if lote_id:
+            queryset = queryset.filter(lote_id=lote_id)
+        if finca_id:
+            queryset = queryset.filter(lote__finca_id=finca_id)
+        if metodo:
+            queryset = queryset.filter(metodo_siembra=metodo.upper())
+        if fecha:
+            queryset = queryset.filter(fecha_siembra=fecha)
 
         return queryset
