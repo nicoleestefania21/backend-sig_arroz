@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Finca, Lote, LaborTerreno, Siembra
+from .models import Finca, Lote, LaborTerreno, Siembra, ActividadAgronomica
 
 
 class FincaSerializer(serializers.ModelSerializer):
@@ -108,3 +108,9 @@ class SiembraSerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError("La densidad de siembra debe ser mayor a cero.")
         return value
+    
+class ActividadAgronomicaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActividadAgronomica
+        fields = '__all__'
+

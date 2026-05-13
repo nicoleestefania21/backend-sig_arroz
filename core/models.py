@@ -84,3 +84,24 @@ class Siembra(models.Model):
 
     def __str__(self):
         return f"Siembra {self.variedad} - {self.lote.nombre} ({self.fecha_siembra})"
+    
+class ActividadAgronomica(models.Model):
+    lote = models.ForeignKey(Lote, on_delete=models.CASCADE, related_name='actividades')
+
+    fertilizante = models.CharField(max_length=100)
+    cantidad_fertilizante = models.FloatField()
+    fecha_fertilizacion = models.DateField()
+
+    control_malezas = models.BooleanField(default=False)
+    metodo_malezas = models.CharField(max_length=100, blank=True)
+
+    producto_fitosanitario = models.CharField(max_length=100, blank=True)
+    dosis = models.CharField(max_length=50, blank=True)
+    fecha_aplicacion = models.DateField(null=True, blank=True)
+
+    etapa_fenologica = models.CharField(max_length=100)
+
+    observaciones = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.lote.nombre} - {self.etapa_fenologica}"

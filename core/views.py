@@ -2,13 +2,14 @@ from rest_framework import viewsets, generics, filters
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Finca, Lote, LaborTerreno, Siembra
+from .models import Finca, Lote, LaborTerreno, Siembra, ActividadAgronomica
 from .serializers import (
     FincaSerializer,
     LoteSerializer,
     LotesPorFincaSerializer,
     LaborTerrenoSerializer,
     SiembraSerializer,
+    ActividadAgronomicaSerializer
 )
 from users.permissions import IsProductorOrTecnicoOrAdmin
 
@@ -107,3 +108,8 @@ class SiembraViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(fecha_siembra=fecha)
 
         return queryset
+
+class ActividadAgronomicaViewSet(viewsets.ModelViewSet):
+    queryset = ActividadAgronomica.objects.all()
+    serializer_class = ActividadAgronomicaSerializer
+    permission_classes = [IsAuthenticated, IsProductorOrTecnicoOrAdmin]
