@@ -110,7 +110,89 @@ class SiembraSerializer(serializers.ModelSerializer):
         return value
     
 class ActividadAgronomicaSerializer(serializers.ModelSerializer):
+    lote_nombre = serializers.CharField(source='lote.nombre', read_only=True)
+    finca_nombre = serializers.CharField(source='lote.finca.nombre', read_only=True)
+    etapa_fenologica_display = serializers.CharField(
+        source='get_etapa_fenologica_display', read_only=True
+    )
+
     class Meta:
         model = ActividadAgronomica
-        fields = '__all__'
+        fields = [
+            'id',
+            'lote', 'lote_nombre', 'finca_nombre', 'siembra',
+            'fertilizante', 'cantidad_fertilizante', 'fecha_fertilizacion',
+            'control_malezas', 'metodo_malezas', 'producto_malezas',
+            'fecha_control_malezas',
+            'producto_fitosanitario', 'dosis_fitosanitario',
+            'fecha_aplicacion_fitosanitaria',
+            'etapa_fenologica', 'etapa_fenologica_display',
+            'observaciones',
+        ]
+
+    def validate_cantidad_fertilizante(self, value):
+        if value <= 0:
+            raise serializers.ValidationError(
+                'La cantidad de fertilizante debe ser mayor a cero.'
+            )
+        return value
+
+    def validate(self, data):
+        # RF-21: si control_malezas=True → metodo y fecha son requeridos
+        control_malezas = data.get(
+            'control_malezas',
+            getattr(self.instance, 'control_malezas', False),
+        )
+        metodo_malezas = data.get(
+            'metodo_malezas',
+            getattr(self.instance, 'metodo_malezas', ''),
+        )
+        fecha_control_malezas = data.get(
+            'fecha_control_malezas',
+            getattr(self.instance, 'fecha_control_malezas', None),
+        )
+        if control_malezas and not metodo_malezas:
+            raise serializers.ValidationError({
+                'metodo_malezas': (
+                    'Debe indicar el método de control cuando '
+                    'control_malezas es verdadero.'
+                )
+            })
+        if control_malezas and not fecha_control_malezas:
+            raise serializers.ValidationError({
+                'fecha_control_malezas': (
+                    'Debe indicar la fecha del control de malezas.'
+                )
+            })
+
+        # RF-22: si se indica producto fitosanitario → dosis y fecha obligatorios
+        producto_fito = data.get(
+            'producto_fitosanitario',
+            getattr(self.instance, 'producto_fitosanitario', ''),
+        )
+        dosis_fito = data.get(
+            'dosis_fitosanitario',
+            getattr(self.instance, 'dosis_fitosanitario', ''),
+        )
+        fecha_fito = data.get(
+            'fecha_aplicacion_fitosanitaria',
+            getattr(self.instance, 'fecha_aplicacion_fitosanitaria', None),
+        )
+        if producto_fito:
+            if not dosis_fito:
+                raise serializers.ValidationError({
+                    'dosis_fitosanitario': (
+                        'La dosis es obligatoria cuando se registra un '
+                        'producto fitosanitario.'
+                    )
+                })
+            if not fecha_fito:
+                raise serializers.ValidationError({
+                    'fecha_aplicacion_fitosanitaria': (
+                        'La fecha de aplicación es obligatoria cuando se '
+                        'registra un producto fitosanitario.'
+                    )
+                })
+
+        return data
 

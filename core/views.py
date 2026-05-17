@@ -110,6 +110,36 @@ class SiembraViewSet(viewsets.ModelViewSet):
         return queryset
 
 class ActividadAgronomicaViewSet(viewsets.ModelViewSet):
-    queryset = ActividadAgronomica.objects.all()
     serializer_class = ActividadAgronomicaSerializer
     permission_classes = [IsAuthenticated, IsProductorOrTecnicoOrAdmin]
+    queryset = (
+        ActividadAgronomica.objects
+        .all()
+        .select_related('lote', 'lote__finca', 'siembra')
+        .order_by('-fecha_fertilizacion', '-id')
+    )
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        lote_id = self.request.query_params.get('lote')
+        finca_id = self.request.query_params.get('finca')
+        siembra_id = self.request.query_params.get('siembra')
+        etapa = self.request.query_params.get('etapa_fenologica')
+        fecha_desde = self.request.query_params.get('fecha_desde')
+        fecha_hasta = self.request.query_params.get('fecha_hasta')
+
+        if lote_id:
+            queryset = queryset.filter(lote_id=lote_id)
+        if finca_id:
+            queryset = queryset.filter(lote__finca_id=finca_id)
+        if siembra_id:
+            queryset = queryset.filter(siembra_id=siembra_id)
+        if etapa:
+            queryset = queryset.filter(etapa_fenologica=etapa.upper())
+        if fecha_desde:
+            queryset = queryset.filter(fecha_fertilizacion__gte=fecha_desde)
+        if fecha_hasta:
+            queryset = queryset.filter(fecha_fertilizacion__lte=fecha_hasta)
+
+        return queryset

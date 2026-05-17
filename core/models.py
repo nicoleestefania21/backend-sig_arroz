@@ -86,22 +86,72 @@ class Siembra(models.Model):
         return f"Siembra {self.variedad} - {self.lote.nombre} ({self.fecha_siembra})"
     
 class ActividadAgronomica(models.Model):
-    lote = models.ForeignKey(Lote, on_delete=models.CASCADE, related_name='actividades')
+    # RF-23 — Etapas fenológicas estándar del cultivo de arroz
+    GERMINACION = 'GERMINACION'
+    PLÁNTULA = 'PLANTULA'
+    MACOLLAMIENTO = 'MACOLLAMIENTO'
+    ELONGACION = 'ELONGACION'
+    PRIMORDIO = 'PRIMORDIO'
+    FLORACION = 'FLORACION'
+    GRANO_LECHOSO = 'GRANO_LECHOSO'
+    GRANO_PASTOSO = 'GRANO_PASTOSO'
+    MADUREZ = 'MADUREZ'
+    COSECHA = 'COSECHA'
 
+    ETAPA_CHOICES = [
+        (GERMINACION, 'Germinación'),
+        (PLÁNTULA, 'Plántula'),
+        (MACOLLAMIENTO, 'Macollamiento'),
+        (ELONGACION, 'Elongación del tallo'),
+        (PRIMORDIO, 'Primordio floral'),
+        (FLORACION, 'Floración / Antesis'),
+        (GRANO_LECHOSO, 'Grano lechoso'),
+        (GRANO_PASTOSO, 'Grano pastoso'),
+        (MADUREZ, 'Madurez fisiológica'),
+        (COSECHA, 'Cosecha'),
+    ]
+
+    # Vínculo principal
+    lote = models.ForeignKey(
+        Lote, on_delete=models.CASCADE, related_name='actividades'
+    )
+    # Opcional: asociar a una siembra concreta para trazabilidad por ciclo
+    siembra = models.ForeignKey(
+        'Siembra',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='actividades',
+    )
+
+    # RF-20 — Fertilización
     fertilizante = models.CharField(max_length=100)
     cantidad_fertilizante = models.FloatField()
     fecha_fertilizacion = models.DateField()
 
+    # RF-21 — Control de malezas
     control_malezas = models.BooleanField(default=False)
     metodo_malezas = models.CharField(max_length=100, blank=True)
+    producto_malezas = models.CharField(
+        max_length=100, blank=True,
+        help_text='Herbicida o producto utilizado (si aplica)'
+    )
+    fecha_control_malezas = models.DateField(
+        null=True, blank=True,
+        help_text='Fecha en que se realizó el control de malezas'
+    )
 
+    # RF-22 — Aplicaciones fitosanitarias
     producto_fitosanitario = models.CharField(max_length=100, blank=True)
-    dosis = models.CharField(max_length=50, blank=True)
-    fecha_aplicacion = models.DateField(null=True, blank=True)
+    dosis_fitosanitario = models.CharField(max_length=50, blank=True)
+    fecha_aplicacion_fitosanitaria = models.DateField(null=True, blank=True)
 
-    etapa_fenologica = models.CharField(max_length=100)
+    # RF-23 — Crecimiento / etapa fenológica
+    etapa_fenologica = models.CharField(
+        max_length=20,
+        choices=ETAPA_CHOICES,
+    )
 
     observaciones = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.lote.nombre} - {self.etapa_fenologica}"
+        return f"{self.lote.nombre} — {self.get_etapa_fenologica_display()}"
