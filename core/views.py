@@ -2,13 +2,14 @@ from rest_framework import viewsets, generics, filters
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Finca, Lote, LaborTerreno, Siembra
+from .models import Finca, Lote, LaborTerreno, Siembra, ActividadAgronomica
 from .serializers import (
     FincaSerializer,
     LoteSerializer,
     LotesPorFincaSerializer,
     LaborTerrenoSerializer,
     SiembraSerializer,
+    ActividadAgronomicaSerializer
 )
 from users.permissions import IsProductorOrTecnicoOrAdmin
 
@@ -105,5 +106,40 @@ class SiembraViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(metodo_siembra=metodo.upper())
         if fecha:
             queryset = queryset.filter(fecha_siembra=fecha)
+
+        return queryset
+
+class ActividadAgronomicaViewSet(viewsets.ModelViewSet):
+    serializer_class = ActividadAgronomicaSerializer
+    permission_classes = [IsAuthenticated, IsProductorOrTecnicoOrAdmin]
+    queryset = (
+        ActividadAgronomica.objects
+        .all()
+        .select_related('lote', 'lote__finca', 'siembra')
+        .order_by('-fecha_fertilizacion', '-id')
+    )
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        lote_id = self.request.query_params.get('lote')
+        finca_id = self.request.query_params.get('finca')
+        siembra_id = self.request.query_params.get('siembra')
+        etapa = self.request.query_params.get('etapa_fenologica')
+        fecha_desde = self.request.query_params.get('fecha_desde')
+        fecha_hasta = self.request.query_params.get('fecha_hasta')
+
+        if lote_id:
+            queryset = queryset.filter(lote_id=lote_id)
+        if finca_id:
+            queryset = queryset.filter(lote__finca_id=finca_id)
+        if siembra_id:
+            queryset = queryset.filter(siembra_id=siembra_id)
+        if etapa:
+            queryset = queryset.filter(etapa_fenologica=etapa.upper())
+        if fecha_desde:
+            queryset = queryset.filter(fecha_fertilizacion__gte=fecha_desde)
+        if fecha_hasta:
+            queryset = queryset.filter(fecha_fertilizacion__lte=fecha_hasta)
 
         return queryset
